@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">MinisTermux</string>
+    <string name="app_name_short">MinisTermux</string>
+    
+    <!-- Permissions -->
+    <string name="perm_run_command_desc">Allows Minis to execute commands in Termux environment</string>
+    
+    <!-- Widget -->
+    <string name="widget_name">MinisTermux Shortcuts</string>
+    <string name="widget_configure">Configure shortcut</string>
+    <string name="widget_no_shortcuts">No shortcuts configured</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">MinisTermux Settings</string>
+    <string name="settings_bridge">Bridge Service</string>
+    <string name="settings_bridge_status">WebSocket bridge status</string>
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_permissions_summary">Manage app permissions</string>
+    <string name="settings_bootstrap">Bootstrap</string>
+    <string name="settings_bootstrap_summary">Re-extract bootstrap files</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    
+    <!-- Notifications -->
+    <string name="notification_bridge_active">MinisTermux Bridge Active</string>
+    <string name="notification_bridge_port">WebSocket on port 8765</string>
+    <string name="notification_x11_active">X11 Server Running</string>
+    <string name="notification_float_active">Floating terminal active</string>
+    
+    <!-- Boot -->
+    <string name="boot_scripts_dir">.termux/boot</string>
+    <string name="boot_scripts_summary">Scripts to run on device boot</string>
+    
+    <!-- Errors -->
+    <string name="error_bootstrap_failed">Bootstrap extraction failed</string>
+    <string name="error_permissions_needed">Please grant all permissions</string>
+    <string name="error_bridge_not_running">Bridge service not running</string>
+    
+    <!-- Minis Integration -->
+    <string name="minis_connected">Connected to OpenMinis</string>
+    <string name="minis_disconnected">Disconnected from OpenMinis</string>
+    <string name="minis_agent_running">Agent running: %1$s</string>
+</resources>

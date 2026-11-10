@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ministermux">
+
+    <!-- Core Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- Storage -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <!-- Termux:API Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:targetApi="31" />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        tools:targetApi="33" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
+    <!-- Network -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    
+    <!-- Package Install -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    
+    <!-- Overlay (Float) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    
+    <!-- Vibration -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <!-- Custom Permission for Minis Bridge -->
+    <permission android:name="com.ministermux.RUN_COMMAND"
+        android:protectionLevel="signature"
+        android:description="@string/perm_run_command_desc" />
+    <uses-permission android:name="com.ministermux.RUN_COMMAND" />
+
+    <application
+        android:name=".MinistermuxApplication"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Ministermux"
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:replace="android:label,android:icon,android:theme">
+        
+        <!-- Main Terminal Activity -->
+        <activity
+            android:name=".ui.TermuxActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|keyboardHidden|density|fontScale"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="ministermux" />
+            </intent-filter>
+        </activity>
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ministermux.Settings" />
+
+        <!-- Minis Bridge Service (WebSocket + Intent) -->
+        <service
+            android:name=".bridge.MinisBridgeService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:process=":bridge" />
+
+        <!-- RunCommand Receiver (Minis Intent API) -->
+        <receiver
+            android:name=".bridge.RunCommandReceiver"
+            android:exported="true"
+            android:permission="com.ministermux.RUN_COMMAND">
+            <intent-filter>
+                <action android:name="com.ministermux.RUN_COMMAND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot Receiver (Auto-start agents) -->
+        <receiver
+            android:name=".boot.BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Termux:API Receiver -->
+        <receiver
+            android:name="com.termux.api.TermuxApiReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.termux.api.TERMUX_API" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Termux:API Foreground Service -->
+        <service
+            android:name="com.termux.api.TermuxApiService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:process=":api" />
+
+        <!-- MinisAgent ContentProvider (File bridge) -->
+        <provider
+            android:name="com.termux.api.MinisAgentProvider"
+            android:authorities="com.ministermux.minisagent"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="com.ministermux.RUN_COMMAND"
+            android:readPermission="com.ministermux.RUN_COMMAND"
+            android:writePermission="com.ministermux.RUN_COMMAND" />
+
+        <!-- X11 Activity -->
+        <activity
+            android:name="com.termux.x11.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Ministermux.X11"
+            android:configChanges="orientation|screenSize|keyboardHidden|density"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true" />
+
+        <!-- X11 Service -->
+        <service
+            android:name="com.termux.x11.X11Service"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"
+            android:process=":x11" />
+
+        <!-- Float Service -->
+        <service
+            android:name="com.termux.float.FloatService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":float" />
+
+        <!-- Tasker Receiver -->
+        <receiver
+            android:name="com.termux.tasker.TaskerReceiver"
+            android:exported="true"
+            android:permission="com.ministermux.RUN_COMMAND">
+            <intent-filter>
+                <action android:name="com.termux.tasker.ACTION_EXECUTE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Widget Provider -->
+        <receiver
+            android:name="com.termux.widget.WidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider" />
+        </receiver>
+
+        <!-- Styling Activity -->
+        <activity
+            android:name="com.termux.styling.StyleActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ministermux.Styling" />
+
+        <!-- File Provider for shared files -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.ministermux.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+    <!-- Queries for external apps -->
+    <queries>
+        <package android:name="org.tasker" />
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
+</manifest>

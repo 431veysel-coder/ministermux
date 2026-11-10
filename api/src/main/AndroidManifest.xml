@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.termux.api">
+
+    <application>
+        <!-- Termux:API Receiver (RPC Socket Bridge) -->
+        <receiver
+            android:name="com.termux.api.TermuxApiReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.termux.api.TERMUX_API" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Termux:API Foreground Service -->
+        <service
+            android:name="com.termux.api.TermuxApiService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:process=":api" />
+
+        <!-- MinisAgent ContentProvider (File bridge for Minis workspace) -->
+        <provider
+            android:name="com.termux.api.MinisAgentProvider"
+            android:authorities="com.ministermux.minisagent"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="com.ministermux.RUN_COMMAND"
+            android:readPermission="com.ministermux.RUN_COMMAND"
+            android:writePermission="com.ministermux.RUN_COMMAND" />
+    </application>
+
+</manifest>
